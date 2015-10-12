@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>{{#i18n}}cns.title{{/i18n}}</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script src="{{#infra}}js/loader.js{{/infra}}" type="text/javascript" id="context"></script>
+		<script src="cns/public/js/controller.js" type="text/javascript"></script>
+		<script type="text/ng-template" id="empty"></script>
+	</head>
+
+	<body ng-controller="CnsController" class="cns">
+		<portal>
+			<div>
+                <h1><i18n>cns.title</i18n></h1>
+                <article class="twelve tabs row">
+                    <header class="horizontal-spacing-twice" ng-repeat="(uai, value) in data" ng-click="selectStructure(uai)" ng-class="{selected: selectedUai === uai}">
+                        <span>[[value.name]]</span>
+                    </header>
+                    <div ng-if="selectedUai && data[selectedUai].loading === true">
+                        <div class="loading-panel">
+                            <h1>
+                                <i18n>loading</i18n>
+                            </h1>
+                        </div>
+                    </div>
+                    <section class="dominos" ng-if="selectedUai && data[selectedUai].loading === false">
+                        <input class="twelve" type="text" ng-model="titleInput" translate attr="placeholder" placeholder="search"/>
+	                    <div class="item" ng-repeat="resource in data[selectedUai].resources | filter: { TitreRessource: titleInput }">
+		                    <section class="domino">
+			                    <div class="top" ng-click="popup(resource)">
+				                    <img ng-src="[[resource.UrlVisuelRessource]]" class="fixed twelve cell" />
+			                    </div>
+			                    <div class="bottom">
+				                    <div class="content centered-text">
+                                        <div>
+                                            <a target="_blank" ng-href="[[resource.UrlAccesressource]]">
+                                                <i class="link" tooltip="direct.link"></i>
+                                            </a>
+                                        </div>
+				                        <h4 class="small-text">[[resource.TitreRessource]]</h4>
+				                    </div>
+			                    </div>
+		                    </section>
+	                    </div>
+                    </section>
+                </article>
+			</div>
+            <lightbox show="targetResource" on-close="popup(null)">
+                <h2>[[targetResource.TitreRessource]]</h2>
+                <img class="three cell horizontal-spacing-twice vertical-spacing" ng-src="[[targetResource.UrlVisuelRessource]]"/>
+                <p bind-html="targetResource.Description"></p>
+                <div class="row centered-text vertical-spacing">
+                    <hr class="separator">
+                    <div class="vertical-spacing">
+                        <strong>
+                            <a target="_blank" ng-href="[[targetResource.UrlAccesressource]]">
+                                <i class="link horizontal-spacing" tooltip="direct.link"></i>
+                                <i18n>direct.link</i18n>
+                            </a>
+                        </strong>
+                    </div>
+                </div>
+            </lightbox>
+		</portal>
+	</body>
+
+</html>

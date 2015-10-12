@@ -1,0 +1,20 @@
+{
+  "name": "org.entcore~cns~0.1-SNAPSHOT",
+  "config": {
+    "main" : "org.entcore.cns.Cns",
+    "port" : 8086,
+    "app-name" : "Cns",
+	"app-address" : "/cns",
+	"app-icon" : "cns-large",
+    "host": "${host}",
+    "ssl" : $ssl,
+    "auto-redeploy": false,
+    "integration-mode" : "HTTP",
+    "app-registry.port" : 8012,
+    "mode" : "${mode}",
+    "entcore.port" : 8009
+    <% if (cnsConfig != null && !cnsConfig.trim().isEmpty()) { %>
+    ,"wsConfig": ${cnsConfig}
+    <% } %>
+  }
+}

@@ -1,0 +1,12 @@
+{
+	"main" : "org.entcore.cns.Cns",
+	"port" : 8086,
+	"app-name" : "Cns",
+	"app-address" : "/cns",
+	"app-icon" : "cns-large",
+	"auto-redeploy": false,
+	"integration-mode" : "HTTP",
+	"app-registry.port" : 8012,
+	"entcore.port" : 8009,
+    "wsConfig": {}
+}
