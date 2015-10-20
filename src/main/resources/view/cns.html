@@ -26,23 +26,25 @@
                     </div>
                     <section class="dominos" ng-if="selectedUai && data[selectedUai].loading === false">
                         <input class="twelve" type="text" ng-model="titleInput" translate attr="placeholder" placeholder="search"/>
-	                    <div class="item" ng-repeat="resource in data[selectedUai].resources | filter: { TitreRessource: titleInput }">
-		                    <section class="domino">
-			                    <div class="top" ng-click="popup(resource)">
-				                    <img ng-src="[[resource.UrlVisuelRessource]]" class="fixed twelve cell" />
-			                    </div>
-			                    <div class="bottom">
-				                    <div class="content centered-text">
-                                        <div>
-                                            <a target="_blank" ng-href="[[resource.UrlAccesressource]]">
-                                                <i class="link" tooltip="direct.link"></i>
-                                            </a>
-                                        </div>
-				                        <h4 class="small-text">[[resource.TitreRessource]]</h4>
-				                    </div>
-			                    </div>
-		                    </section>
-	                    </div>
+                        <alphabetical list="resource in data[selectedUai].resources | filter: { TitreRessource: titleInput }" title="TitreRessource">
+    	                    <div class="item">
+    		                    <section class="domino">
+    			                    <div class="top" ng-click="popup(resource)">
+    				                    <img ng-src="[[resource.UrlVisuelRessource]]" class="fixed twelve cell" />
+    			                    </div>
+    			                    <div class="bottom">
+    				                    <div class="content centered-text">
+                                            <div>
+                                                <a target="_blank" ng-href="[[resource.UrlAccesressource]]">
+                                                    <i class="link" tooltip="direct.link"></i>
+                                                </a>
+                                            </div>
+    				                        <h4 class="small-text">[[resource.TitreRessource]]</h4>
+    				                    </div>
+    			                    </div>
+    		                    </section>
+    	                    </div>
+                        </alphabet>
                     </section>
                 </article>
 			</div>
