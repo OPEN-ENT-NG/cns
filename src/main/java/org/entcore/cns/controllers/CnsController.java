@@ -257,7 +257,7 @@ public class CnsController extends BaseController {
 								        input.createElement("EnfantId", "");
 										break;
 									case "Teacher":
-										input.createElement("ENTPersonProfils", "National_ENS|National_TUT");
+										input.createElement("ENTPersonProfils", "National_ENS");
 										input.createElement("ENTEleveMEF", "");
 										input.createElement("ENTEleveCodeEnseignements", "");
 										input.createElement("ENTEleveClasses", "");
