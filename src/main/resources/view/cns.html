@@ -13,7 +13,7 @@
 		<portal>
 			<div>
                 <h1><i18n>cns.title</i18n></h1>
-                <article class="twelve tabs row">
+                <div class="twelve tabs row">
                     <header class="horizontal-spacing-twice" ng-repeat="(uai, value) in data" ng-click="selectStructure(uai)" ng-class="{selected: selectedUai === uai}">
                         <span>[[value.name]]</span>
                     </header>
@@ -31,22 +31,22 @@
     		                    <section class="domino">
     			                    <div class="top" ng-click="popup(resource)">
     				                    <img ng-src="[[resource.UrlVisuelRessource]]" class="fixed twelve cell" />
+										<div class="ribbon">
+											<i class="knur-plus"></i>
+										</div>
     			                    </div>
     			                    <div class="bottom">
     				                    <div class="content centered-text">
-                                            <div>
-                                                <a target="_blank" ng-href="[[resource.UrlAccesressource]]&UAI=[[selectedUai]]">
-                                                    <i class="link" tooltip="direct.link"></i>
-                                                </a>
-                                            </div>
-    				                        <h4 class="small-text">[[resource.TitreRessource]]</h4>
+                                            <a target="_blank" ng-href="[[resource.UrlAccesressource]]&UAI=[[selectedUai]]" tooltip="direct.link">
+												<h4 class="small-text">[[resource.TitreRessource]]</h4>
+                                            </a>
     				                    </div>
     			                    </div>
     		                    </section>
     	                    </div>
                         </alphabet>
                     </section>
-                </article>
+                </div>
 			</div>
             <lightbox show="targetResource" on-close="popup(null)">
                 <h2>[[targetResource.TitreRessource]]</h2>
