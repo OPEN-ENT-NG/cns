@@ -12,7 +12,10 @@
 	<body ng-controller="CnsController" class="cns">
 		<portal>
 			<div>
-                <h1><i18n>cns.title</i18n></h1>
+                <h1>
+					<i class="cns"></i>
+					<i18n>cns.title</i18n>
+				</h1>
                 <div class="twelve tabs row">
                     <header class="horizontal-spacing-twice" ng-repeat="(uai, value) in data" ng-click="selectStructure(uai)" ng-class="{selected: selectedUai === uai}">
                         <span>[[value.name]]</span>
