@@ -12,17 +12,17 @@ CnsController = ($scope, $http, xmlHelper) ->
             .success (data) ->
                 try
                     xmlDocument = $.parseXML(data)
-                    codeRetour = $(xmlDocument).find('messageRetour')[0].innerHTML
+                    codeRetour = $(xmlDocument).find('messageRetour')[0].textContent
 
                     if codeRetour isnt "OK"
-                        console.log codeRetour
+                        console.error codeRetour
                         dataObj.loading = false
                     else
-                        dataObj.typeSSO = $(xmlDocument).find('TypeSSO')[0].innerHTML
+                        dataObj.typeSSO = $(xmlDocument).find('TypeSSO')[0].textContent
                         if hook then hook?(uai, dataObj) else dataObj.loading = false
                 catch error
                     dataObj.loading = false
-                    console.log error
+                    console.error error
 
             .error (data, status) ->
                 dataObj.loading = false
@@ -32,9 +32,9 @@ CnsController = ($scope, $http, xmlHelper) ->
             .success (data) ->
                 try
                     xmlDocument = $.parseXML(data)
-                    codeRetour = $(xmlDocument).find('messageRetour')[0].innerHTML
+                    codeRetour = $(xmlDocument).find('messageRetour')[0].textContent
                     if codeRetour isnt "OK"
-                        console.log codeRetour
+                        console.error codeRetour
                     else
                         dataObj.resources = []
                         _.each $(xmlDocument).find('ressources').children(), (ressource) ->
@@ -43,7 +43,7 @@ CnsController = ($scope, $http, xmlHelper) ->
                     dataObj.loading = false
                 catch error
                     dataObj.loading = false
-                    console.log error
+                    console.error error
 
             .error (data, status) ->
                 dataObj.loading = false

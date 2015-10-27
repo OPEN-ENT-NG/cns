@@ -17,12 +17,12 @@ CnsController = function($scope, $http, xmlHelper) {
       var codeRetour, error, xmlDocument;
       try {
         xmlDocument = $.parseXML(data);
-        codeRetour = $(xmlDocument).find('messageRetour')[0].innerHTML;
+        codeRetour = $(xmlDocument).find('messageRetour')[0].textContent;
         if (codeRetour !== "OK") {
-          console.log(codeRetour);
+          console.error(codeRetour);
           return dataObj.loading = false;
         } else {
-          dataObj.typeSSO = $(xmlDocument).find('TypeSSO')[0].innerHTML;
+          dataObj.typeSSO = $(xmlDocument).find('TypeSSO')[0].textContent;
           if (hook) {
             return typeof hook === "function" ? hook(uai, dataObj) : void 0;
           } else {
@@ -32,7 +32,7 @@ CnsController = function($scope, $http, xmlHelper) {
       } catch (_error) {
         error = _error;
         dataObj.loading = false;
-        return console.log(error);
+        return console.error(error);
       }
     }).error(function(data, status) {
       return dataObj.loading = false;
@@ -48,9 +48,9 @@ CnsController = function($scope, $http, xmlHelper) {
       var codeRetour, error, xmlDocument;
       try {
         xmlDocument = $.parseXML(data);
-        codeRetour = $(xmlDocument).find('messageRetour')[0].innerHTML;
+        codeRetour = $(xmlDocument).find('messageRetour')[0].textContent;
         if (codeRetour !== "OK") {
-          console.log(codeRetour);
+          console.error(codeRetour);
         } else {
           dataObj.resources = [];
           _.each($(xmlDocument).find('ressources').children(), function(ressource) {
@@ -61,7 +61,7 @@ CnsController = function($scope, $http, xmlHelper) {
       } catch (_error) {
         error = _error;
         dataObj.loading = false;
-        return console.log(error);
+        return console.error(error);
       }
     }).error(function(data, status) {
       return dataObj.loading = false;
