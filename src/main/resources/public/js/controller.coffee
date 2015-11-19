@@ -55,10 +55,12 @@ CnsController = ($scope, $http, xmlHelper) ->
             $scope.data[uai].loading = true
             InitUserRessourcesCatalog uai, $scope.data[uai], UserRessourcesCatalog
 
-    for uai, i in model.me.uai
-        $scope.data[uai] =
-            name: model.me.structureNames[i]
-        #On display, select first UAI
-        $scope.selectStructure uai if i is 0
-        #InitUserRessourcesCatalog uai, $scope.data[uai], UserRessourcesCatalog
+    #Sync. structures
+    $http.get '/userbook/structures'
+        .success (data) ->
+            for structure, i in data when structure.UAI
+                $scope.data[structure.UAI] = structure
+                #On display, select first UAI
+                $scope.selectStructure structure.UAI if i is 0
+    			#InitUserRessourcesCatalog structure.UAI, structure, UserRessourcesCatalog
     @

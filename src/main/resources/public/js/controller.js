@@ -1,7 +1,7 @@
 var CnsController;
 
 CnsController = function($scope, $http, xmlHelper) {
-  var InitUserRessourcesCatalog, UserRessourcesCatalog, i, j, len, ref, uai;
+  var InitUserRessourcesCatalog, UserRessourcesCatalog;
   $scope.me = model.me;
   $scope.data = {};
   $scope.targetResource = null;
@@ -74,15 +74,22 @@ CnsController = function($scope, $http, xmlHelper) {
       return InitUserRessourcesCatalog(uai, $scope.data[uai], UserRessourcesCatalog);
     }
   };
-  ref = model.me.uai;
-  for (i = j = 0, len = ref.length; j < len; i = ++j) {
-    uai = ref[i];
-    $scope.data[uai] = {
-      name: model.me.structureNames[i]
-    };
-    if (i === 0) {
-      $scope.selectStructure(uai);
+  $http.get('/userbook/structures').success(function(data) {
+    var i, j, len, results, structure;
+    results = [];
+    for (i = j = 0, len = data.length; j < len; i = ++j) {
+      structure = data[i];
+      if (!structure.UAI) {
+        continue;
+      }
+      $scope.data[structure.UAI] = structure;
+      if (i === 0) {
+        results.push($scope.selectStructure(structure.UAI));
+      } else {
+        results.push(void 0);
+      }
     }
-  }
+    return results;
+  });
   return this;
 };
