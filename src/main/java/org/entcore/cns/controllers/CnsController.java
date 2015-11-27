@@ -159,12 +159,10 @@ public class CnsController extends BaseController {
 							for(Object codeEnsObj : data.getArray("fieldOfStudy", new JsonArray())){
 								String codeEns = (String) codeEnsObj;
 								codeEnseignement += codeEnseignement.length() == 0 ? "" : "|";
-								codeEnseignement += codeEns.substring(0, 6);
+								codeEnseignement += codeEns;
 							}
 							//MEF élève
 							String eleveMef = data.getString("module", "");
-							if(eleveMef.length() > 5)
-								eleveMef = eleveMef.substring(0, 6);
 							//MEF enseignant
 							String ensMef = "";
 							for(Object moduleObj: data.getArray("modules", new JsonArray())){
