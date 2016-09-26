@@ -19,70 +19,84 @@
 
 package org.entcore.cns.controllers;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.soap.SOAPException;
-
-import org.entcore.common.soap.SoapHelper;
+import org.entcore.cns.services.CnsService;
 import org.entcore.common.soap.SoapHelper.SoapDescriptor.Element;
 import org.entcore.common.soap.SoapHelper.SoapDescriptor;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpClient;
-import org.vertx.java.core.http.HttpClientRequest;
-import org.vertx.java.core.http.HttpClientResponse;
-import org.vertx.java.core.http.HttpHeaders;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.platform.Container;
 import org.vertx.java.core.eventbus.Message;
 
 import fr.wseduc.rs.Get;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
+import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
 
 public class CnsController extends BaseController {
-
-	private final HttpClient soapClient;
-	private final JsonObject conf;
-	private final URL soapEndpoint;
 
 	private final Pattern mefStatPattern = Pattern.compile(".*\\$([0-9]{6}).*\\$.*");
 	private final Pattern classGroupPattern = Pattern.compile(".*\\$(.*)");
 	private final Pattern matPattern = Pattern.compile(".*\\$.*\\$([0-9]{6}).*");
 
-	public CnsController(HttpClient soapClient, JsonObject conf){
-		this.soapClient = soapClient;
-		this.conf = conf;
-		URL endpoint = null;
-		try {
-			endpoint = new URL(conf.getString("endpoint"));
-			if("https".equals(endpoint.getProtocol())){
-				soapClient
-					.setHost(endpoint.getHost())
-					.setSSL(true)
-					.setTrustAll(true)
-					.setPort(443);
-			} else {
-				soapClient
-					.setHost(endpoint.getHost())
-					.setPort(endpoint.getPort() == -1 ? 80 : endpoint.getPort());
+	private final HashMap<String, CnsService> services = new HashMap<>();
+
+	private final JsonArray configurations;
+
+	public CnsController(JsonArray configurations){
+		this.configurations = configurations;
+	}
+
+	@Override
+	public void init(Vertx vertx, Container container, RouteMatcher rm,
+			Map<String, fr.wseduc.webutils.security.SecuredAction> securedActions){
+		super.init(vertx, container, rm, securedActions);
+
+		for(Object confObj : configurations){
+			JsonObject conf = (JsonObject) confObj;
+			String domain = conf.getString("domain");
+			if(domain != null){
+				try{
+					services.put(domain, new CnsService(vertx.createHttpClient(), conf));
+				} catch(MalformedURLException e){
+					log.error("[CNS] Malformed endpoint URL for domain : "+domain);
+				}
 			}
-		} catch (MalformedURLException e) {
-			log.error(e);
 		}
-		soapEndpoint = endpoint;
+	}
+
+	private JsonObject getConfByHost(final HttpServerRequest request){
+		CnsService service = getServiceByHost(request);
+		return service != null ? service.getConf() : new JsonObject();
+	}
+
+	private CnsService getServiceByHost(final HttpServerRequest request){
+		CnsService service = this.services.get(getHost(request));
+		if(service == null){
+			for(Entry<String, CnsService> item: this.services.entrySet()){
+				service = item.getValue();
+				break;
+			}
+		}
+		return service;
 	}
 
 	private SoapDescriptor initDescriptor(String function){
@@ -113,7 +127,6 @@ public class CnsController extends BaseController {
 		return input;
 	}
 
-
 	@Get("")
 	@SecuredAction("cns.access")
 	public void view(HttpServerRequest request) {
@@ -124,8 +137,9 @@ public class CnsController extends BaseController {
 	@SecuredAction(type = ActionType.AUTHENTICATED, value = "")
 	public void InitUserRessourcesCatalog(final HttpServerRequest request){
 		String UAI = request.params().get("uai");
+		CnsService service = getServiceByHost(request);
 
-		if(UAI == null || UAI.trim().length() == 0){
+		if(UAI == null || UAI.trim().length() == 0 || service == null){
 			badRequest(request);
 			return;
 		}
@@ -133,11 +147,20 @@ public class CnsController extends BaseController {
 		SoapDescriptor descriptor = initDescriptor("InitUserRessourcesCatalog");
 
 		Element input = descriptor.createElement("input", "");
-		input.createElement("Cle", produceHash(conf.getString("key")));
-		input.createElement("Pf", conf.getString("platform", ""));
+		input.createElement("Cle", produceHash(service.getConf().getString("key")));
+		input.createElement("Pf", service.getConf().getString("platform", ""));
 		input.createElement("ENTPersonStructRattachUAI", UAI);
 
-		processMessage(request, descriptor);
+		service.processMessage(descriptor, new Handler<Either<String,Buffer>>() {
+			public void handle(Either<String, Buffer> event) {
+				if(event.isLeft()){
+					log.error(event.left().getValue());
+					renderError(request);
+				} else {
+					request.response().end(event.right().getValue());
+				}
+			}
+		});
 	}
 
 	@Get("/UserRessourcesCatalog")
@@ -145,8 +168,9 @@ public class CnsController extends BaseController {
 	public void InitUserRessourcesCatalogResponse(final HttpServerRequest request){
 		final String UAI = request.params().get("uai");
 		final String TypeSSO = request.params().get("typesso");
+		final CnsService service = getServiceByHost(request);
 
-		if(UAI == null || UAI.trim().isEmpty() || TypeSSO == null || TypeSSO.trim().isEmpty()){
+		if(UAI == null || UAI.trim().isEmpty() || TypeSSO == null || TypeSSO.trim().isEmpty() || service == null){
 			badRequest(request);
 			return;
 		}
@@ -253,8 +277,8 @@ public class CnsController extends BaseController {
 							SoapDescriptor descriptor = initDescriptor("UserRessourcesCatalog");
 							Element input = descriptor.createElement("input", "");
 
-							input.createElement("Cle", produceHash(conf.getString("key")));
-							input.createElement("Pf", conf.getString("platform", ""));
+							input.createElement("Cle", produceHash(service.getConf().getString("key")));
+							input.createElement("Pf", service.getConf().getString("platform", ""));
 							input.createElement("ENTPersonStructRattachUAI", UAI);
 
 							JsonArray profiles = data.getArray("type", new JsonArray());
@@ -336,7 +360,16 @@ public class CnsController extends BaseController {
 					        input.createElement("user", infos.getExternalId());
 					        input.createElement("ENTStructureTypeStruct", structType);
 
-							processMessage(request, descriptor);
+					        service.processMessage(descriptor, new Handler<Either<String,Buffer>>() {
+								public void handle(Either<String, Buffer> event) {
+									if(event.isLeft()){
+										log.error(event.left().getValue());
+										renderError(request);
+									} else {
+										request.response().end(event.right().getValue());
+									}
+								}
+							});
 
 						} else {
 							renderError(request);
@@ -346,31 +379,5 @@ public class CnsController extends BaseController {
 			}
 		});
 	}
-
-	private void processMessage(final HttpServerRequest request, SoapDescriptor messageDescriptor){
-		String xml = "";
-		try {
-			xml = SoapHelper.createSoapMessage(messageDescriptor);
-		} catch (SOAPException | IOException e) {
-			log.error("["+CnsController.class.getSimpleName()+"]("+messageDescriptor.getBodyTagName()+") Error while building the soap request.");
-			log.error(e);
-		}
-
-		HttpClientRequest req = soapClient.post(soapEndpoint.getPath(), new Handler<HttpClientResponse>() {
-			public void handle(final HttpClientResponse response) {
-				response.bodyHandler(new Handler<Buffer>() {
-					@Override
-					public void handle(Buffer body) {
-						request.response().end(body);
-					}
-				});
-			}
-		});
-		req
-			.putHeader("SOAPAction", "http://cns.connecteur-universel.com/webservices/#" + messageDescriptor.getBodyTagName())
-			.putHeader(HttpHeaders.CONTENT_TYPE, "text/xml;charset=UTF-8");
-		req.end(xml);
-	}
-
 
 }

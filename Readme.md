@@ -12,11 +12,12 @@
 *Fichier json de configuration vert.x*
 
 ```javascript
-"wsConfig": {
+"wsConfig": [{
+        "domain": "",   //Domaine du site ent-core
         "endpoint": "", //Adresse du webservice
         "key": "",      //Clef unique fournie par CNS
         "platform": ""  //ID Plateforme fourni par CNS
-    }
+    }] // Tableau de configuation par domaine
 ```
 
 *Fichier de configuration springboard*

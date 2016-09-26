@@ -22,7 +22,7 @@ package org.entcore.cns;
 import org.entcore.cns.controllers.CnsController;
 import org.entcore.common.http.BaseServer;
 import org.vertx.java.core.http.HttpClient;
-import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.json.JsonArray;
 
 public class Cns extends BaseServer {
 
@@ -32,15 +32,13 @@ public class Cns extends BaseServer {
 	public void start() {
 		super.start();
 
-		final JsonObject config = container.config().getObject("wsConfig", new JsonObject());
-		if(!config.containsField("endpoint")){
+		final JsonArray configs = container.config().getArray("wsConfig", new JsonArray());
+		if(configs.size() < 1){
 			this.stop();
-			log.error("[CNS] No endpoint provided.");
+			log.error("[CNS] No configuration provided.");
 			return;
 		}
-
-		soapClient = vertx.createHttpClient();
-		addController(new CnsController(soapClient, config));
+		addController(new CnsController(configs));
 	}
 
 	@Override
