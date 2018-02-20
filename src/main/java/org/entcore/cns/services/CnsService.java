@@ -6,17 +6,15 @@ import java.net.URL;
 
 import javax.xml.soap.SOAPException;
 
+import io.vertx.core.Vertx;
+import io.vertx.core.http.*;
 import org.entcore.common.soap.SoapHelper;
 import org.entcore.common.soap.SoapHelper.SoapDescriptor;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpClient;
-import org.vertx.java.core.http.HttpClientRequest;
-import org.vertx.java.core.http.HttpClientResponse;
-import org.vertx.java.core.http.HttpHeaders;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import fr.wseduc.webutils.Either;
 
@@ -28,22 +26,23 @@ public class CnsService {
 
 	private final Logger log = LoggerFactory.getLogger(CnsService.class);
 
-	public CnsService(HttpClient soapClient, JsonObject conf) throws MalformedURLException{
-		this.soapClient = soapClient;
+	public CnsService(Vertx vertx, JsonObject conf) throws MalformedURLException{
+		HttpClientOptions soapClientOptions = new HttpClientOptions();
 		this.conf = conf;
 
 		URL endpoint = new URL(conf.getString("endpoint"));
 		if("https".equals(endpoint.getProtocol())){
-			soapClient
-				.setHost(endpoint.getHost())
-				.setSSL(true)
+			soapClientOptions
+				.setDefaultHost(endpoint.getHost())
+				.setSsl(true)
 				.setTrustAll(true)
-				.setPort(443);
+				.setDefaultPort(443);
 		} else {
-			soapClient
-				.setHost(endpoint.getHost())
-				.setPort(endpoint.getPort() == -1 ? 80 : endpoint.getPort());
+			soapClientOptions
+				.setDefaultHost(endpoint.getHost())
+				.setDefaultPort(endpoint.getPort() == -1 ? 80 : endpoint.getPort());
 		}
+		soapClient = vertx.createHttpClient(soapClientOptions);
 		soapEndpoint = endpoint;
 	}
 

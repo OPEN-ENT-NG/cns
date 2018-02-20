@@ -21,18 +21,18 @@ package org.entcore.cns;
 
 import org.entcore.cns.controllers.CnsController;
 import org.entcore.common.http.BaseServer;
-import org.vertx.java.core.http.HttpClient;
-import org.vertx.java.core.json.JsonArray;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.json.JsonArray;
 
 public class Cns extends BaseServer {
 
 	private HttpClient soapClient;
 
 	@Override
-	public void start() {
+	public void start() throws Exception {
 		super.start();
 
-		final JsonArray configs = container.config().getArray("wsConfig", new JsonArray());
+		final JsonArray configs = config.getJsonArray("wsConfig", new JsonArray());
 		if(configs.size() < 1){
 			this.stop();
 			log.error("[CNS] No configuration provided.");
@@ -42,7 +42,7 @@ public class Cns extends BaseServer {
 	}
 
 	@Override
-	public void stop(){
+	public void stop() throws Exception {
 		super.stop();
 		if(soapClient != null)
 			soapClient.close();
