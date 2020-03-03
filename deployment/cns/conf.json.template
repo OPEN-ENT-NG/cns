@@ -1,5 +1,5 @@
 {
-  "name": "org.entcore~cns~1.10-SNAPSHOT",
+  "name": "org.entcore~cns~1.11-SNAPSHOT",
   "config": {
     "main" : "org.entcore.cns.Cns",
     "port" : 8086,
