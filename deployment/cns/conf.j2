@@ -1,0 +1,30 @@
+{
+    "name": "{{ cnsVersion }}",
+    "config": {
+        "main": "org.entcore.cns.Cns",
+        "port": 8086,
+        "app-name": "Cns",
+        "app-address": "/cns",
+        "app-icon": "cns-large",
+        "host": "https://{{ host }}",
+        "ssl": true,
+        {% if overrideTheme %} "override-theme": {}, {% endif %}
+        "auto-redeploy": false,
+        "integration-mode": "HTTP",
+        "app-registry.port": 8012,
+        "mode": "prod",
+        "entcore.port": 8009,
+        "wsConfig": {{ cnsConfig|default('[]') }},
+        "publicConf": {
+            "xiti": {
+                "ID_SERVICE": {
+                    "default": 13
+                },
+                "LIBELLE_SERVICE": {
+                    "default": "PAGE_ENT"
+                },
+                "OUTIL": "CNS"
+            }
+        }
+    }
+}
