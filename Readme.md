@@ -1,11 +1,12 @@
 # Application Cns
 
-* Licence : [AGPL v3](http://www.gnu.org/licenses/agpl.txt) - Copyright Conseil Régional Nord Pas de Calais - Picardie, Conseil départemental de l'Essonne, Conseil régional d'Aquitaine-Limousin-Poitou-Charentes
+* Licence : [AGPL v3](http://www.gnu.org/licenses/agpl.txt) - Copyright Région Hauts-de-France (ex Picardie), Département Essonne, Région Nouvelle Aquitaine (ex Poitou-Charente)
 
-* Développeur(s) : ATOS
+* Développeur(s) : ATOS, Open Digital Education
 
-* Financeur(s) : Région Nord Pas de Calais-Picardie,  Département 91, Région Aquitaine-Limousin-Poitou-Charentes
+* Financeur(s) : Région Hauts-de-France (ex Picardie), Département Essonne, Région Nouvelle Aquitaine (ex Poitou-Charente)
 
+* Description : cette appplication permet de visualiser dans l'ENT ses ressources CNS. Les ressources sont récupérées via un service web, il est nécessaire de se rapprocher de l'éditeur CNS afin d'obtenir les informations nécessaires à sa configuration.
 
 ## Configuration
 
