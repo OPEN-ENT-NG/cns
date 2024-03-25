@@ -19,6 +19,7 @@
 
 package org.entcore.cns;
 
+import io.vertx.core.Promise;
 import org.entcore.cns.controllers.CnsController;
 import org.entcore.common.http.BaseServer;
 import io.vertx.core.http.HttpClient;
@@ -29,8 +30,8 @@ public class Cns extends BaseServer {
 	private HttpClient soapClient;
 
 	@Override
-	public void start() throws Exception {
-		super.start();
+	public void start(Promise<Void> startPromise) throws Exception {
+		super.start(startPromise);
 
 		final JsonArray configs = config.getJsonArray("wsConfig", new JsonArray());
 		if(configs.size() < 1){
@@ -39,6 +40,7 @@ public class Cns extends BaseServer {
 			return;
 		}
 		addController(new CnsController(configs));
+		startPromise.tryComplete();
 	}
 
 	@Override
