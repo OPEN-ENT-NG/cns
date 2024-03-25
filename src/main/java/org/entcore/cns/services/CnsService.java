@@ -18,6 +18,8 @@ import io.vertx.core.logging.LoggerFactory;
 
 import fr.wseduc.webutils.Either;
 
+import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
+
 public class CnsService {
 
 	private final HttpClient soapClient;
@@ -59,21 +61,15 @@ public class CnsService {
 			handler.handle(new Either.Left<String, Buffer>(e.getMessage()));
 			return;
 		}
-
-		HttpClientRequest req = soapClient.post(soapEndpoint.getPath(), new Handler<HttpClientResponse>() {
-			public void handle(final HttpClientResponse response) {
-				response.bodyHandler(new Handler<Buffer>() {
-					@Override
-					public void handle(Buffer body) {
-						handler.handle(new Either.Right<String, Buffer>(body));
-					}
-				});
-			}
-		});
-		req
-			.putHeader("SOAPAction", "http://cns.connecteur-universel.com/webservices/#" + messageDescriptor.getBodyTagName())
-			.putHeader(HttpHeaders.CONTENT_TYPE, "text/xml;charset=UTF-8");
-		req.end(xml);
+		final String payload = xml;
+		final RequestOptions options = new RequestOptions()
+			.setURI(soapEndpoint.getPath())
+			.addHeader("SOAPAction", "http://cns.connecteur-universel.com/webservices/#" + messageDescriptor.getBodyTagName())
+			.addHeader(CONTENT_TYPE, "text/xml;charset=UTF-8");
+		soapClient.request(options)
+			.flatMap(r -> r.send(payload))
+			.onSuccess(response -> response.bodyHandler(body -> handler.handle(new Either.Right<>(body))))
+			.onFailure(th -> handler.handle(new Either.Left<>(th.getMessage())));
 	}
 
 }
