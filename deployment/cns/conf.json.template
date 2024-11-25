@@ -1,5 +1,5 @@
 {
-  "name": "org.entcore~cns~2.0-b2school-SNAPSHOT",
+  "name": "org.entcore~cns~${cnsVersion}",
   "config": {
     "main" : "org.entcore.cns.Cns",
     "port" : 8086,
