@@ -30,8 +30,12 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.entcore.cns.Cns;
 import org.entcore.cns.services.CnsService;
 import org.entcore.common.soap.SoapHelper.SoapDescriptor.Element;
+import org.entcore.common.events.EventHelper;
+import org.entcore.common.events.EventStore;
+import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.soap.SoapHelper.SoapDescriptor;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
@@ -42,8 +46,6 @@ import io.vertx.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-
-import io.vertx.core.eventbus.Message;
 
 import fr.wseduc.rs.Get;
 import fr.wseduc.security.ActionType;
@@ -62,6 +64,8 @@ public class CnsController extends BaseController {
 	private final HashMap<String, CnsService> services = new HashMap<>();
 
 	private final JsonArray configurations;
+
+  private EventHelper eventHelper;
 
 	public CnsController(JsonArray configurations){
 		this.configurations = configurations;
@@ -83,6 +87,9 @@ public class CnsController extends BaseController {
 				}
 			}
 		}
+
+    final EventStore eventStore = EventStoreFactory.getFactory().getEventStore(Cns.class.getSimpleName());
+		this.eventHelper =  new EventHelper(eventStore);
 	}
 
 	private JsonObject getConfByHost(final HttpServerRequest request){
@@ -133,6 +140,7 @@ public class CnsController extends BaseController {
 	@SecuredAction("cns.access")
 	public void view(HttpServerRequest request) {
 		renderView(request);
+    eventHelper.onAccess(request);
 	}
 
 	@Get("/InitUserRessourcesCatalog")
