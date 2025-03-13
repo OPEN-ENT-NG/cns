@@ -64,6 +64,7 @@ public class CnsService {
 		final String payload = xml;
 		final RequestOptions options = new RequestOptions()
 			.setURI(soapEndpoint.getPath())
+			.setMethod(HttpMethod.POST)
 			.addHeader("SOAPAction", "http://cns.connecteur-universel.com/webservices/#" + messageDescriptor.getBodyTagName())
 			.addHeader(CONTENT_TYPE, "text/xml;charset=UTF-8");
 		soapClient.request(options)
