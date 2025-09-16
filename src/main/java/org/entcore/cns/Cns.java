@@ -19,6 +19,7 @@
 
 package org.entcore.cns;
 
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import org.entcore.cns.controllers.CnsController;
 import org.entcore.common.http.BaseServer;
@@ -31,16 +32,23 @@ public class Cns extends BaseServer {
 
 	@Override
 	public void start(Promise<Void> startPromise) throws Exception {
-		super.start(startPromise);
+		final Promise<Void> promise = Promise.promise();
+		super.start(promise);
+		promise.future().compose(init -> intCns()).onComplete(startPromise);
+	}
 
+	private Future<Void> intCns() {
 		final JsonArray configs = config.getJsonArray("wsConfig", new JsonArray());
 		if(configs.size() < 1){
-			this.stop();
 			log.error("[CNS] No configuration provided.");
-			return;
+			try {
+				this.stop();
+			} catch (Exception e) {
+				return Future.failedFuture(e);
+			}
 		}
 		addController(new CnsController(configs));
-		startPromise.tryComplete();
+		return Future.succeededFuture();
 	}
 
 	@Override
