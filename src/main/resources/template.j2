@@ -1,0 +1,18 @@
+{
+  "name": "org.entcore~cns",
+  "config": {
+    "main": "org.entcore.cns.Cns",
+    "port": 8086,
+    "app-name": "cns",
+    "app-address": "/cns",
+    "app-icon": "cns-large",
+    "host": "https://{{ host }}",
+    "ssl": true,
+    "auto-redeploy": false,
+    "integration-mode": "{{ integration_mode|default('HTTP') }}",
+    "app-registry.port": 8012,
+    "mode": "prod",
+    "entcore.port": 8009,
+    "wsConfig": {{ cnsConfig|default('[]') }}
+  }
+}
