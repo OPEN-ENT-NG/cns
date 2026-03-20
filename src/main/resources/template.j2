@@ -2,6 +2,10 @@
   "name": "org.entcore~cns",
   "config": {
     "main": "org.entcore.cns.Cns",
+    "probes": [
+      "org.entcore.common.http.health.Neo4jProbe",
+      "org.entcore.common.http.health.MongoProbe"
+    ],
     "port": 8086,
     "app-name": "cns",
     "app-address": "/cns",
