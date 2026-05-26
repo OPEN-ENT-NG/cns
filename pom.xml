@@ -11,7 +11,7 @@
   </parent>
   <groupId>org.entcore</groupId>
   <artifactId>cns</artifactId>
-  <version>2.1-SNAPSHOT</version>
+  <version>2.1-feat-separation-SNAPSHOT</version>
   <scm>
     <connection>scm:git:https://github.com/OPEN-ENT-NG/cns.git</connection>
     <developerConnection>scm:git:https://github.com/OPEN-ENT-NG/cns.git</developerConnection>
@@ -26,8 +26,8 @@
   </repositories>
   <properties>
     <entCoreLibsVersion>6.14-separation-SNAPSHOT</entCoreLibsVersion>
-    <entCoreVersion>6.14-SNAPSHOT</entCoreVersion>
-    <modMongoVersion>4.1-SNAPSHOT</modMongoVersion>
+    <entCoreVersion>6.14-feat-separation-SNAPSHOT</entCoreVersion>
+    <modMongoVersion>4.1-feat-separation-SNAPSHOT</modMongoVersion>
     <modJsonSchemaValidatorVersion>2.1-SNAPSHOT</modJsonSchemaValidatorVersion>
   </properties>
   <dependencies>
